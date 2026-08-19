@@ -6,26 +6,29 @@ financial documents.
 
 ## Current status
 
-Milestone **M1-02** provides the executable API and configuration foundation:
+Milestone **M1-03** provides the executable API and local database foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
 - OpenAPI schema and Swagger UI;
 - typed environment-based settings;
 - secret-safe configuration values;
+- PostgreSQL 17 with pgvector 0.8.6 through Docker Compose;
+- automatic pgvector extension initialization;
+- persistent local database storage and a container healthcheck;
 - automated tests with Pytest;
 - linting and formatting with Ruff.
 
-Document ingestion, PostgreSQL, pgvector, embeddings, retrieval, and answer generation are
-planned but are not implemented yet.
+Application database connections, document ingestion, embeddings, retrieval, and answer
+generation are planned but are not implemented yet.
 
 ## Requirements
 
 - Python 3.14
 - `pip`
+- Docker Desktop or another Docker Engine with Compose
 
-No running database, Docker service, Gemini API key, or network access is required for this
-milestone.
+No Gemini API key is required for this milestone.
 
 ## Local setup
 
@@ -49,9 +52,48 @@ All environment variables use the `FINRAG_` prefix. The current settings are:
 | `FINRAG_APP_NAME` | `FinRAG Agent Platform` | Optional |
 | `FINRAG_ENVIRONMENT` | `development` | Set to `production` |
 | `FINRAG_API_KEY` | Not configured | Required |
+| `FINRAG_DB_USER` | Used by local Compose | Not intended for production |
+| `FINRAG_DB_PASSWORD` | Used by local Compose | Not intended for production |
+| `FINRAG_DB_NAME` | Used by local Compose | Not intended for production |
+| `FINRAG_DB_PORT` | `5432` in local Compose | Not intended for production |
 | `FINRAG_DATABASE_URL` | Not configured | Required |
 
-The example values are placeholders. Never store real secrets in `.env.example` or Git.
+The example values are local-only placeholders. Never store real or production secrets in
+`.env.example` or Git. Keep `FINRAG_DATABASE_URL` synchronized with the four local database
+variables when overriding them.
+
+## Run the local database
+
+Create `.env` from the development example, then start PostgreSQL:
+
+```bash
+cp .env.example .env
+docker compose up -d --wait postgres
+```
+
+Check the database and pgvector extension:
+
+```bash
+docker compose exec postgres psql -U finrag -d finrag -c "SELECT 1;"
+docker compose exec postgres psql -U finrag -d finrag \
+  -c "SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';"
+```
+
+Inspect the service or stop it without deleting data:
+
+```bash
+docker compose ps
+docker compose logs postgres
+docker compose down
+```
+
+The Compose volume `finrag_postgres_data` (created by Docker as
+`finrag-agent-platform_finrag_postgres_data`) preserves local data across container restarts and
+`docker compose down`. Delete it only when you intentionally want a clean local database:
+
+```bash
+docker compose down --volumes
+```
 
 ## Run the API
 
@@ -102,11 +144,14 @@ features from planned work so that portfolio claims remain verifiable.
 - No real credentials or private financial data belong in this repository.
 - Only public or synthetic documents will be used during the MVP.
 - Local `.env` files are ignored by Git.
+- Compose requires local database credentials from `.env`; the committed values are development
+  placeholders only.
+- PostgreSQL binds to `127.0.0.1`, so it is not exposed on every host network interface.
 - Secrets use masked Pydantic `SecretStr` values and are excluded from validation inputs.
 - Production startup fails when the internal API key or database URL is absent.
 - The liveness endpoint performs no external I/O and exposes no internal details.
 
 ## Next issue
 
-M1-03 will add a local PostgreSQL service with pgvector through Docker Compose. The application
-will connect to it in M1-04.
+M1-04 will connect the FastAPI application to PostgreSQL and add a dependency-aware `/ready`
+endpoint.
