@@ -6,11 +6,13 @@ financial documents.
 
 ## Current status
 
-Milestone **M1-01** provides only the executable API foundation:
+Milestone **M1-02** provides the executable API and configuration foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
 - OpenAPI schema and Swagger UI;
+- typed environment-based settings;
+- secret-safe configuration values;
 - automated tests with Pytest;
 - linting and formatting with Ruff.
 
@@ -22,7 +24,8 @@ planned but are not implemented yet.
 - Python 3.14
 - `pip`
 
-No database, Docker service, Gemini API key, or network access is required for this milestone.
+No running database, Docker service, Gemini API key, or network access is required for this
+milestone.
 
 ## Local setup
 
@@ -32,6 +35,23 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
+
+Copy the configuration example if you want to override development defaults:
+
+```bash
+cp .env.example .env
+```
+
+All environment variables use the `FINRAG_` prefix. The current settings are:
+
+| Variable | Development default | Production |
+|---|---|---|
+| `FINRAG_APP_NAME` | `FinRAG Agent Platform` | Optional |
+| `FINRAG_ENVIRONMENT` | `development` | Set to `production` |
+| `FINRAG_API_KEY` | Not configured | Required |
+| `FINRAG_DATABASE_URL` | Not configured | Required |
+
+The example values are placeholders. Never store real secrets in `.env.example` or Git.
 
 ## Run the API
 
@@ -82,9 +102,11 @@ features from planned work so that portfolio claims remain verifiable.
 - No real credentials or private financial data belong in this repository.
 - Only public or synthetic documents will be used during the MVP.
 - Local `.env` files are ignored by Git.
+- Secrets use masked Pydantic `SecretStr` values and are excluded from validation inputs.
+- Production startup fails when the internal API key or database URL is absent.
 - The liveness endpoint performs no external I/O and exposes no internal details.
 
 ## Next issue
 
-M1-02 will add typed application settings and secret-handling rules. Database and pgvector
-support arrive in later M1 issues.
+M1-03 will add a local PostgreSQL service with pgvector through Docker Compose. The application
+will connect to it in M1-04.
