@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M1-03** provides the executable API and local database foundation:
+Milestone **M1-04** provides the executable API and database readiness foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -16,11 +16,13 @@ Milestone **M1-03** provides the executable API and local database foundation:
 - PostgreSQL 17 with pgvector 0.8.6 through Docker Compose;
 - automatic pgvector extension initialization;
 - persistent local database storage and a container healthcheck;
+- Psycopg 3 asynchronous connection pool managed by the FastAPI lifespan;
+- `GET /ready` connectivity and pgvector check with a maximum two-second timeout;
 - automated tests with Pytest;
 - linting and formatting with Ruff.
 
-Application database connections, document ingestion, embeddings, retrieval, and answer
-generation are planned but are not implemented yet.
+Document ingestion, embeddings, retrieval, and answer generation are planned but are not
+implemented yet.
 
 ## Requirements
 
@@ -57,6 +59,7 @@ All environment variables use the `FINRAG_` prefix. The current settings are:
 | `FINRAG_DB_NAME` | Used by local Compose | Not intended for production |
 | `FINRAG_DB_PORT` | `5432` in local Compose | Not intended for production |
 | `FINRAG_DATABASE_URL` | Not configured | Required |
+| `FINRAG_READINESS_TIMEOUT_SECONDS` | `2` | Maximum `2` |
 
 The example values are local-only placeholders. Never store real or production secrets in
 `.env.example` or Git. Keep `FINRAG_DATABASE_URL` synchronized with the four local database
@@ -105,6 +108,7 @@ The local endpoints are:
 
 - API: <http://127.0.0.1:8000>
 - Health: <http://127.0.0.1:8000/health>
+- Readiness: <http://127.0.0.1:8000/ready>
 - Swagger UI: <http://127.0.0.1:8000/docs>
 - OpenAPI schema: <http://127.0.0.1:8000/openapi.json>
 
@@ -116,6 +120,23 @@ The health response is intentionally independent of external services:
 }
 ```
 
+Readiness checks PostgreSQL connectivity and the pgvector extension:
+
+```json
+{
+  "status": "ready"
+}
+```
+
+If the database is unavailable, unconfigured, times out, or does not have pgvector enabled,
+`/ready` returns HTTP `503` with no connection details:
+
+```json
+{
+  "status": "not_ready"
+}
+```
+
 ## Validate the project
 
 Run the tests:
@@ -123,6 +144,14 @@ Run the tests:
 ```bash
 python -m pytest
 ```
+
+Run the real PostgreSQL integration test after starting the Compose service:
+
+```bash
+FINRAG_RUN_INTEGRATION=1 python -m pytest -m integration
+```
+
+The integration test is skipped by default so unit tests remain independent of Docker.
 
 Run linting and formatting checks:
 
@@ -150,8 +179,11 @@ features from planned work so that portfolio claims remain verifiable.
 - Secrets use masked Pydantic `SecretStr` values and are excluded from validation inputs.
 - Production startup fails when the internal API key or database URL is absent.
 - The liveness endpoint performs no external I/O and exposes no internal details.
+- The readiness endpoint checks only PostgreSQL and pgvector, never Gemini.
+- Database failures return only `{"status":"not_ready"}` without host, credentials, SQL, or
+  stack traces.
 
 ## Next issue
 
-M1-04 will connect the FastAPI application to PostgreSQL and add a dependency-aware `/ready`
-endpoint.
+M1-05 will add shared HTTP conventions, request IDs, payload limits, and internal API-key
+authentication for `/v1` routes.

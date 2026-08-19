@@ -17,6 +17,7 @@ def clear_finrag_environment(monkeypatch: pytest.MonkeyPatch) -> None:
         "FINRAG_APP_NAME",
         "FINRAG_DATABASE_URL",
         "FINRAG_ENVIRONMENT",
+        "FINRAG_READINESS_TIMEOUT_SECONDS",
     ):
         monkeypatch.delenv(variable_name, raising=False)
 
@@ -27,6 +28,7 @@ def test_development_defaults_require_no_secrets() -> None:
     assert settings.environment is Environment.DEVELOPMENT
     assert settings.database_url is None
     assert settings.api_key is None
+    assert settings.readiness_timeout_seconds == 2.0
 
     with TestClient(create_app(settings=settings)) as client:
         response = client.get("/health")
@@ -76,3 +78,8 @@ def test_validation_errors_hide_invalid_input_values() -> None:
         Settings(environment=secret_input, _env_file=None)
 
     assert secret_input not in str(captured_error.value)
+
+
+def test_readiness_timeout_cannot_exceed_two_seconds() -> None:
+    with pytest.raises(ValidationError):
+        Settings(readiness_timeout_seconds=2.1, _env_file=None)

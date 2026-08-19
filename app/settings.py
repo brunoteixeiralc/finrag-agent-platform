@@ -4,7 +4,7 @@ from enum import StrEnum
 from functools import lru_cache
 from typing import Self
 
-from pydantic import SecretStr, model_validator
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     environment: Environment = Environment.DEVELOPMENT
     database_url: SecretStr | None = None
     api_key: SecretStr | None = None
+    readiness_timeout_seconds: float = Field(default=2.0, gt=0, le=2.0)
 
     @model_validator(mode="after")
     def require_production_secrets(self) -> Self:

@@ -6,13 +6,14 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import create_app
+from app.settings import Settings
 
 
 @pytest.fixture
 def client() -> Iterator[TestClient]:
     """Create an isolated HTTP client for each test."""
 
-    with TestClient(create_app()) as test_client:
+    with TestClient(create_app(settings=Settings(_env_file=None))) as test_client:
         yield test_client
 
 
@@ -28,6 +29,7 @@ def test_openapi_documents_health_endpoint(client: TestClient) -> None:
 
     assert response.status_code == 200
     assert "/health" in response.json()["paths"]
+    assert "/ready" in response.json()["paths"]
 
 
 def test_swagger_ui_is_available(client: TestClient) -> None:
