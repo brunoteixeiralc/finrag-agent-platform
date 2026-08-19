@@ -7,6 +7,7 @@ from fastapi import FastAPI
 
 from app.api.infrastructure import router as infrastructure_router
 from app.database import DatabaseGateway, PsycopgDatabase, UnconfiguredDatabase
+from app.http import RequestIdMiddleware, register_error_handlers
 from app.settings import Settings, get_settings
 
 
@@ -47,6 +48,8 @@ def create_app(
     )
     application.state.settings = resolved_settings
     application.state.database = resolved_database
+    application.add_middleware(RequestIdMiddleware)
+    register_error_handlers(application)
     application.include_router(infrastructure_router)
     return application
 

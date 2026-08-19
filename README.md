@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M1-04** provides the executable API and database readiness foundation:
+Milestone **M1-05** provides the executable API, database readiness, and HTTP security foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -18,6 +18,10 @@ Milestone **M1-04** provides the executable API and database readiness foundatio
 - persistent local database storage and a container healthcheck;
 - Psycopg 3 asynchronous connection pool managed by the FastAPI lifespan;
 - `GET /ready` connectivity and pgvector check with a maximum two-second timeout;
+- validated `X-Request-ID` propagation;
+- uniform public error envelopes without internal details;
+- constant-time Bearer API-key authentication for future `/v1` routes;
+- CORS denied by default;
 - automated tests with Pytest;
 - linting and formatting with Ruff.
 
@@ -137,6 +141,29 @@ If the database is unavailable, unconfigured, times out, or does not have pgvect
 }
 ```
 
+## HTTP and security conventions
+
+Every response includes an `X-Request-ID` header. A canonical UUID supplied by the client is
+preserved; missing or invalid values are replaced with a generated UUID. Future functional
+responses under `/v1` will also include the same value in their JSON body.
+
+Public errors use one envelope:
+
+```json
+{
+  "error": {
+    "code": "unauthorized",
+    "message": "Authentication credentials are missing or invalid."
+  },
+  "request_id": "16c57582-d812-4ad7-aa07-4de17ca1b96c"
+}
+```
+
+The Bearer dependency for `/v1` uses the configured `FINRAG_API_KEY` and timing-safe comparison.
+No functional `/v1` route exists yet, so the production OpenAPI intentionally does not advertise
+an unused security scheme. `/health`, `/ready`, `/docs`, and `/openapi.json` remain public. CORS is
+not enabled; browser origins must be explicitly approved in a future requirement.
+
 ## Validate the project
 
 Run the tests:
@@ -182,8 +209,11 @@ features from planned work so that portfolio claims remain verifiable.
 - The readiness endpoint checks only PostgreSQL and pgvector, never Gemini.
 - Database failures return only `{"status":"not_ready"}` without host, credentials, SQL, or
   stack traces.
+- Invalid request IDs are never trusted or reflected.
+- Rejected API keys and validation inputs are not echoed in responses.
+- Unexpected failures return a generic `internal_error` envelope.
 
 ## Next issue
 
-M1-05 will add shared HTTP conventions, request IDs, payload limits, and internal API-key
-authentication for `/v1` routes.
+M1-06 will add a non-root application container and run the API and PostgreSQL together through
+Docker Compose.
