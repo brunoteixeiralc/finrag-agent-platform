@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M1-05** provides the executable API, database readiness, and HTTP security foundation:
+Milestone **M1-06** provides a containerized API and database foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -22,6 +22,8 @@ Milestone **M1-05** provides the executable API, database readiness, and HTTP se
 - uniform public error envelopes without internal details;
 - constant-time Bearer API-key authentication for future `/v1` routes;
 - CORS denied by default;
+- reproducible API and PostgreSQL services through Docker Compose;
+- minimal Python 3.14 application image running as a non-root user;
 - automated tests with Pytest;
 - linting and formatting with Ruff.
 
@@ -58,6 +60,7 @@ All environment variables use the `FINRAG_` prefix. The current settings are:
 | `FINRAG_APP_NAME` | `FinRAG Agent Platform` | Optional |
 | `FINRAG_ENVIRONMENT` | `development` | Set to `production` |
 | `FINRAG_API_KEY` | Not configured | Required |
+| `FINRAG_API_PORT` | `8000` in local Compose | Not intended for production |
 | `FINRAG_DB_USER` | Used by local Compose | Not intended for production |
 | `FINRAG_DB_PASSWORD` | Used by local Compose | Not intended for production |
 | `FINRAG_DB_NAME` | Used by local Compose | Not intended for production |
@@ -102,7 +105,35 @@ The Compose volume `finrag_postgres_data` (created by Docker as
 docker compose down --volumes
 ```
 
-## Run the API
+## Run the complete stack with Docker
+
+Build the API image and start both services:
+
+```bash
+docker compose up --build -d --wait
+```
+
+Compose waits for PostgreSQL to become healthy before starting the API. It then waits for the API
+healthcheck before returning. Verify the services and endpoints:
+
+```bash
+docker compose ps
+curl -i http://127.0.0.1:8000/health
+curl -i http://127.0.0.1:8000/ready
+```
+
+Inspect logs or stop the stack while preserving database data:
+
+```bash
+docker compose logs api
+docker compose logs postgres
+docker compose down
+```
+
+The API container receives configuration at runtime from Compose. The image itself contains no
+`.env`, tests, local virtual environment, database data, or API keys.
+
+## Run the API without Docker
 
 ```bash
 python -m uvicorn app.main:app --reload
@@ -202,6 +233,10 @@ features from planned work so that portfolio claims remain verifiable.
 - Local `.env` files are ignored by Git.
 - Compose requires local database credentials from `.env`; the committed values are development
   placeholders only.
+- The API image runs as the dedicated non-root UID/GID `10001`.
+- `.dockerignore` excludes local configuration, tests, caches, Git history, and documentation from
+  the image build context.
+- No API key or database credential is passed as a Docker build argument or copied into the image.
 - PostgreSQL binds to `127.0.0.1`, so it is not exposed on every host network interface.
 - Secrets use masked Pydantic `SecretStr` values and are excluded from validation inputs.
 - Production startup fails when the internal API key or database URL is absent.
@@ -215,5 +250,5 @@ features from planned work so that portfolio claims remain verifiable.
 
 ## Next issue
 
-M1-06 will add a non-root application container and run the API and PostgreSQL together through
-Docker Compose.
+M1-07 will close the milestone with CI, consolidated validation commands, architecture
+documentation, and troubleshooting guidance.

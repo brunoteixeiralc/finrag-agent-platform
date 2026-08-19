@@ -1,6 +1,35 @@
 name: finrag-agent-platform
 
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: finrag-agent-platform-api:local
+    environment:
+      FINRAG_API_KEY: ${FINRAG_API_KEY:?Set FINRAG_API_KEY in .env}
+      FINRAG_DATABASE_URL: postgresql://${FINRAG_DB_USER}:${FINRAG_DB_PASSWORD}@postgres:5432/${FINRAG_DB_NAME}
+      FINRAG_ENVIRONMENT: development
+      FINRAG_READINESS_TIMEOUT_SECONDS: ${FINRAG_READINESS_TIMEOUT_SECONDS:-2}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${FINRAG_API_PORT:-8000}:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    stop_grace_period: 10s
+
   postgres:
     image: pgvector/pgvector:0.8.6-pg17-bookworm
     environment:
