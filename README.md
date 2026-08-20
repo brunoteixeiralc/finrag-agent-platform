@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M1-06** provides a containerized API and database foundation:
+Milestone **M1 is complete** and provides a tested API and database foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -25,14 +25,16 @@ Milestone **M1-06** provides a containerized API and database foundation:
 - reproducible API and PostgreSQL services through Docker Compose;
 - minimal Python 3.14 application image running as a non-root user;
 - automated tests with Pytest;
-- linting and formatting with Ruff.
+- linting and formatting with Ruff;
+- GitHub Actions jobs for quality checks and isolated PostgreSQL + pgvector integration tests;
+- M1 architecture and troubleshooting documentation.
 
 Document ingestion, embeddings, retrieval, and answer generation are planned but are not
 implemented yet.
 
 ## Requirements
 
-- Python 3.14
+- Python 3.14 (Docker and CI use 3.14.6)
 - `pip`
 - Docker Desktop or another Docker Engine with Compose
 
@@ -197,10 +199,10 @@ not enabled; browser origins must be explicitly approved in a future requirement
 
 ## Validate the project
 
-Run the tests:
+Run the unit tests without Docker or network access:
 
 ```bash
-python -m pytest
+python -m pytest -m "not integration"
 ```
 
 Run the real PostgreSQL integration test after starting the Compose service:
@@ -218,10 +220,27 @@ ruff check .
 ruff format --check .
 ```
 
+The default `python -m pytest` command remains safe: integration tests require both the marker
+selection and `FINRAG_RUN_INTEGRATION=1`, otherwise they are skipped.
+
+## Continuous integration
+
+The GitHub Actions workflow runs on every push and pull request, and can also be started manually.
+It has read-only repository permissions and two independent jobs:
+
+1. Ruff lint, Ruff format check, and unit tests without external services;
+2. integration tests against an isolated PostgreSQL 17 + pgvector 0.8.6 container.
+
+The workflow uses only committed local-development placeholders. It does not require or print a
+Gemini key, production database URL, or other real secret. The integration job always removes its
+temporary containers and volume.
+
 ## Documentation
 
 - [M0 API contract](docs/api-contract-m0.md)
 - [Architecture Decision Records](docs/adr/README.md)
+- [M1 architecture](docs/architecture-m1.md)
+- [Troubleshooting](docs/troubleshooting.md)
 
 The M0 documents define the intended MVP behavior. This README distinguishes implemented
 features from planned work so that portfolio claims remain verifiable.
@@ -248,7 +267,8 @@ features from planned work so that portfolio claims remain verifiable.
 - Rejected API keys and validation inputs are not echoed in responses.
 - Unexpected failures return a generic `internal_error` envelope.
 
-## Next issue
+## Next milestone
 
-M1-07 will close the milestone with CI, consolidated validation commands, architecture
-documentation, and troubleshooting guidance.
+M2 will implement document ingestion incrementally. Embeddings, retrieval, answer generation,
+agent behavior, observability, and cloud deployment remain later work and must not be presented as
+implemented features.
