@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M2-01** adds the versioned document database schema to the tested M1 foundation:
+Milestone **M2-02** adds local document input contracts and validation to the tested M1 foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -31,9 +31,14 @@ Milestone **M2-01** adds the versioned document database schema to the tested M1
 - versioned `documents` and `chunks` tables with `vector(768)`, SHA-256 uniqueness, and cascade
   deletion;
 - real database integration tests for schema invariants.
+- immutable internal contracts for received files, extracted pages, extracted documents, and
+  chunks without embeddings;
+- local validation of the 5 MiB limit, filename, extension, MIME type, PDF signature, SHA-256,
+  source fields, dates, and bounded metadata;
+- stable ingestion error codes that do not expose rejected file content or metadata.
 
-Document ingestion, embeddings, retrieval, and answer generation are planned but are not
-implemented yet.
+Document extraction, chunking, persistence from the application, embeddings, retrieval, and answer
+generation are planned but are not implemented yet.
 
 ## Requirements
 
@@ -255,6 +260,7 @@ temporary containers and volume.
 - [Architecture Decision Records](docs/adr/README.md)
 - [M1 architecture](docs/architecture-m1.md)
 - [Document database schema](docs/database-schema.md)
+- [Document input validation](docs/document-input-validation.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
 The M0 documents define the intended MVP behavior. This README distinguishes implemented
@@ -280,10 +286,12 @@ features from planned work so that portfolio claims remain verifiable.
   stack traces.
 - Invalid request IDs are never trusted or reflected.
 - Rejected API keys and validation inputs are not echoed in responses.
+- Supplied filenames are normalized for display only and never used as filesystem paths.
+- Source URLs are validated and stored without making outbound requests.
 - Unexpected failures return a generic `internal_error` envelope.
 
 ## Next issue
 
-M2-02 will add internal document-processing contracts and safe input validation. Upload endpoints,
-embeddings, retrieval, answer generation, agent behavior, observability, and cloud deployment
-remain later work and must not be presented as implemented features.
+M2-03 will extract Markdown and plain text into deterministic structured blocks. Upload endpoints,
+embeddings, retrieval, answer generation, agent behavior, observability, and cloud deployment remain
+later work and must not be presented as implemented features.

@@ -1,0 +1,38 @@
+"""Stable, content-safe errors for document ingestion."""
+
+from enum import StrEnum
+
+
+class IngestionErrorCode(StrEnum):
+    """Machine-readable failures for future translation to HTTP errors."""
+
+    EMPTY_FILE = "empty_file"
+    FILE_TOO_LARGE = "file_too_large"
+    INVALID_FILENAME = "invalid_filename"
+    UNSUPPORTED_FILE_EXTENSION = "unsupported_file_extension"
+    UNSUPPORTED_MIME_TYPE = "unsupported_mime_type"
+    FILE_TYPE_MISMATCH = "file_type_mismatch"
+    UNSAFE_FILE_CONTENT = "unsafe_file_content"
+    INVALID_TITLE = "invalid_title"
+    INVALID_SOURCE_NAME = "invalid_source_name"
+    INVALID_SOURCE_URL = "invalid_source_url"
+    INVALID_PUBLISHED_AT = "invalid_published_at"
+    INVALID_METADATA = "invalid_metadata"
+    METADATA_TOO_LARGE = "metadata_too_large"
+    METADATA_TOO_MANY_KEYS = "metadata_too_many_keys"
+    METADATA_RESERVED_KEY = "metadata_reserved_key"
+
+
+class DocumentValidationError(ValueError):
+    """Validation failure that never includes rejected values or file content."""
+
+    def __init__(
+        self,
+        code: IngestionErrorCode,
+        message: str,
+        *,
+        field: str | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.field = field
