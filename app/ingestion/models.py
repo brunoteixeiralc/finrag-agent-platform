@@ -17,6 +17,16 @@ class SupportedMimeType(StrEnum):
     PDF = "application/pdf"
 
 
+class ExtractedBlockKind(StrEnum):
+    """Structural block types preserved for deterministic chunking."""
+
+    FRONTMATTER = "frontmatter"
+    HEADING = "heading"
+    PARAGRAPH = "paragraph"
+    LIST = "list"
+    TABLE = "table"
+
+
 @dataclass(frozen=True, slots=True)
 class ReceivedDocumentFile:
     """Untrusted file values received before extraction."""
@@ -42,11 +52,22 @@ class ValidatedDocumentInput:
 
 
 @dataclass(frozen=True, slots=True)
+class ExtractedBlock:
+    """One ordered content block associated with its Markdown section."""
+
+    kind: ExtractedBlockKind
+    content: str
+    section: str | None
+    heading_level: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class ExtractedPage:
     """One extracted page or text unit with source location information."""
 
     page_index: int | None
     content: str
+    blocks: tuple[ExtractedBlock, ...]
     page_label: str | None = None
 
 

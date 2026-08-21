@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M2-02** adds local document input contracts and validation to the tested M1 foundation:
+Milestone **M2-03** adds deterministic Markdown and plain-text extraction to the tested foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -36,8 +36,12 @@ Milestone **M2-02** adds local document input contracts and validation to the te
 - local validation of the 5 MiB limit, filename, extension, MIME type, PDF signature, SHA-256,
   source fields, dates, and bounded metadata;
 - stable ingestion error codes that do not expose rejected file content or metadata.
+- UTF-8 and UTF-8 BOM decoding with normalized line endings and a 500,000-character limit;
+- ordered structural blocks for headings, paragraphs, lists, tables, and frontmatter;
+- hierarchical Markdown sections and deterministic title derivation;
+- prompt injection preserved as untrusted document content, never executed as an instruction.
 
-Document extraction, chunking, persistence from the application, embeddings, retrieval, and answer
+PDF extraction, chunking, persistence from the application, embeddings, retrieval, and answer
 generation are planned but are not implemented yet.
 
 ## Requirements
@@ -261,6 +265,7 @@ temporary containers and volume.
 - [M1 architecture](docs/architecture-m1.md)
 - [Document database schema](docs/database-schema.md)
 - [Document input validation](docs/document-input-validation.md)
+- [Markdown and plain-text extraction](docs/text-extraction.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
 The M0 documents define the intended MVP behavior. This README distinguishes implemented
@@ -288,10 +293,11 @@ features from planned work so that portfolio claims remain verifiable.
 - Rejected API keys and validation inputs are not echoed in responses.
 - Supplied filenames are normalized for display only and never used as filesystem paths.
 - Source URLs are validated and stored without making outbound requests.
+- Frontmatter and prompt injection remain untrusted content and cannot change application behavior.
 - Unexpected failures return a generic `internal_error` envelope.
 
 ## Next issue
 
-M2-03 will extract Markdown and plain text into deterministic structured blocks. Upload endpoints,
-embeddings, retrieval, answer generation, agent behavior, observability, and cloud deployment remain
-later work and must not be presented as implemented features.
+M2-04 will extract textual PDFs while preserving page locations. Upload endpoints, embeddings,
+retrieval, answer generation, agent behavior, observability, and cloud deployment remain later work
+and must not be presented as implemented features.

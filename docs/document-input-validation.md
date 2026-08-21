@@ -15,7 +15,10 @@ validate size, name, extension, MIME, signature, and fields
 ValidatedDocumentInput + deterministic SHA-256
         |
         v
-future extractor -> ExtractedDocument -> future chunker -> ChunkDraft
+text extractor or future PDF extractor -> ExtractedDocument
+        |
+        v
+future chunker -> ChunkDraft
 ```
 
 The contracts are frozen, slotted dataclasses. `ChunkDraft` intentionally has no embedding because

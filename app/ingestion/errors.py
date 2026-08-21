@@ -21,6 +21,10 @@ class IngestionErrorCode(StrEnum):
     METADATA_TOO_LARGE = "metadata_too_large"
     METADATA_TOO_MANY_KEYS = "metadata_too_many_keys"
     METADATA_RESERVED_KEY = "metadata_reserved_key"
+    INVALID_TEXT_ENCODING = "invalid_text_encoding"
+    EMPTY_EXTRACTED_TEXT = "empty_extracted_text"
+    EXTRACTED_TEXT_TOO_LARGE = "extracted_text_too_large"
+    UNSUPPORTED_EXTRACTION_TYPE = "unsupported_extraction_type"
 
 
 class DocumentValidationError(ValueError):
