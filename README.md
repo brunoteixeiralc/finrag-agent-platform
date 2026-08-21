@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M1 is complete** and provides a tested API and database foundation:
+Milestone **M2-01** adds the versioned document database schema to the tested M1 foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -27,7 +27,10 @@ Milestone **M1 is complete** and provides a tested API and database foundation:
 - automated tests with Pytest;
 - linting and formatting with Ruff;
 - GitHub Actions jobs for quality checks and isolated PostgreSQL + pgvector integration tests;
-- M1 architecture and troubleshooting documentation.
+- M1 architecture and troubleshooting documentation;
+- versioned `documents` and `chunks` tables with `vector(768)`, SHA-256 uniqueness, and cascade
+  deletion;
+- real database integration tests for schema invariants.
 
 Document ingestion, embeddings, retrieval, and answer generation are planned but are not
 implemented yet.
@@ -90,6 +93,17 @@ docker compose exec postgres psql -U finrag -d finrag -c "SELECT 1;"
 docker compose exec postgres psql -U finrag -d finrag \
   -c "SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';"
 ```
+
+For a database volume created before M2-01, apply the document schema once without deleting local
+data:
+
+```bash
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U finrag -d finrag \
+  -f /docker-entrypoint-initdb.d/002-create-document-schema.sql
+```
+
+New database volumes apply both versioned initialization files automatically. See the
+[database schema documentation](docs/database-schema.md) before applying a migration manually.
 
 Inspect the service or stop it without deleting data:
 
@@ -240,6 +254,7 @@ temporary containers and volume.
 - [M0 API contract](docs/api-contract-m0.md)
 - [Architecture Decision Records](docs/adr/README.md)
 - [M1 architecture](docs/architecture-m1.md)
+- [Document database schema](docs/database-schema.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
 The M0 documents define the intended MVP behavior. This README distinguishes implemented
@@ -267,8 +282,8 @@ features from planned work so that portfolio claims remain verifiable.
 - Rejected API keys and validation inputs are not echoed in responses.
 - Unexpected failures return a generic `internal_error` envelope.
 
-## Next milestone
+## Next issue
 
-M2 will implement document ingestion incrementally. Embeddings, retrieval, answer generation,
-agent behavior, observability, and cloud deployment remain later work and must not be presented as
-implemented features.
+M2-02 will add internal document-processing contracts and safe input validation. Upload endpoints,
+embeddings, retrieval, answer generation, agent behavior, observability, and cloud deployment
+remain later work and must not be presented as implemented features.
