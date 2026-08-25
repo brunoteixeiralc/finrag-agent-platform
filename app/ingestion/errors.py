@@ -30,6 +30,8 @@ class IngestionErrorCode(StrEnum):
     PDF_PAGE_LIMIT_EXCEEDED = "pdf_page_limit_exceeded"
     PDF_OCR_UNSUPPORTED = "pdf_ocr_unsupported"
     PDF_CONTENT_STREAM_TOO_LARGE = "pdf_content_stream_too_large"
+    CHUNK_CONTEXT_TOO_LARGE = "chunk_context_too_large"
+    CHUNK_TABLE_ROW_TOO_LARGE = "chunk_table_row_too_large"
 
 
 class DocumentValidationError(ValueError):

@@ -1,5 +1,6 @@
 """Local document ingestion contracts and validation."""
 
+from app.ingestion.chunking import chunk_document
 from app.ingestion.errors import DocumentValidationError, IngestionErrorCode
 from app.ingestion.models import (
     ChunkDraft,
@@ -26,6 +27,7 @@ __all__ = [
     "ReceivedDocumentFile",
     "SupportedMimeType",
     "ValidatedDocumentInput",
+    "chunk_document",
     "extract_pdf_document",
     "extract_text_document",
     "validate_document_input",

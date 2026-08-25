@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M2-04** adds safe textual-PDF extraction to the tested foundation:
+Milestone **M2-05** adds deterministic structure-aware chunking to the tested foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -30,24 +30,28 @@ Milestone **M2-04** adds safe textual-PDF extraction to the tested foundation:
 - M1 architecture and troubleshooting documentation;
 - versioned `documents` and `chunks` tables with `vector(768)`, SHA-256 uniqueness, and cascade
   deletion;
-- real database integration tests for schema invariants.
+- real database integration tests for schema invariants;
 - immutable internal contracts for received files, extracted pages, extracted documents, and
   chunks without embeddings;
 - local validation of the 5 MiB limit, filename, extension, MIME type, PDF signature, SHA-256,
   source fields, dates, and bounded metadata;
-- stable ingestion error codes that do not expose rejected file content or metadata.
+- stable ingestion error codes that do not expose rejected file content or metadata;
 - UTF-8 and UTF-8 BOM decoding with normalized line endings and a 500,000-character limit;
 - ordered structural blocks for headings, paragraphs, lists, tables, and frontmatter;
 - hierarchical Markdown sections and deterministic title derivation;
-- prompt injection preserved as untrusted document content, never executed as an instruction.
+- prompt injection preserved as untrusted document content, never executed as an instruction;
 - strict textual-PDF parsing with one-based physical page indexes and explicit page labels when
   present;
 - rejection of encrypted, malformed, image-only, oversized, or over-50-page PDFs with safe errors;
 - no execution or traversal of PDF JavaScript, links, attachments, or embedded content;
-- manual extraction checks against three public June 2026 Banco Central do Brasil reports.
+- manual extraction checks against three public June 2026 Banco Central do Brasil reports;
+- character-based chunking with a 1,800-character target and a strict 2,400-character maximum;
+- page and semantic-section boundaries preserved for future citations;
+- sentence-aware overlap capped at 300 characters within the same page and section;
+- Markdown headings repeated as context and tables kept whole or split by row with their header.
 
-Chunking, persistence from the application, embeddings, retrieval, and answer generation are
-planned but are not implemented yet. OCR is intentionally outside the MVP.
+Processing orchestration, persistence from the application, embeddings, retrieval, and answer
+generation are planned but are not implemented yet. OCR is intentionally outside the MVP.
 
 ## Requirements
 
@@ -272,6 +276,7 @@ temporary containers and volume.
 - [Document input validation](docs/document-input-validation.md)
 - [Markdown and plain-text extraction](docs/text-extraction.md)
 - [Textual PDF extraction](docs/pdf-extraction.md)
+- [Structure-aware chunking](docs/chunking.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
 The M0 documents define the intended MVP behavior. This README distinguishes implemented
@@ -305,6 +310,6 @@ features from planned work so that portfolio claims remain verifiable.
 
 ## Next issue
 
-M2-05 will implement deterministic structure-aware chunking. Upload endpoints, embeddings,
-retrieval, answer generation, agent behavior, observability, and cloud deployment remain later work
-and must not be presented as implemented features.
+M2-06 will compose validation, extraction, and chunking into one local processing use case. Upload
+endpoints, embeddings, retrieval, answer generation, agent behavior, observability, and cloud
+deployment remain later work and must not be presented as implemented features.
