@@ -174,6 +174,15 @@ def test_pdf_above_fifty_pages_is_rejected_before_page_extraction() -> None:
     assert captured_error.value.code is IngestionErrorCode.PDF_PAGE_LIMIT_EXCEEDED
 
 
+def test_pdf_at_exactly_fifty_pages_is_accepted() -> None:
+    source = validated_pdf(pdf_bytes([f"Page {index}" for index in range(1, 51)]))
+
+    extracted = extract_pdf_document(source)
+
+    assert len(extracted.pages) == 50
+    assert extracted.pages[-1].page_index == 50
+
+
 def test_malformed_pdf_returns_safe_error() -> None:
     rejected_content = b"%PDF-1.7\nnot-a-valid-pdf-containing-sensitive-data"
     source = validated_pdf(rejected_content)

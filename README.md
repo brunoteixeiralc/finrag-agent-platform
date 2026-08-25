@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M2-06** composes the complete local document-processing pipeline on the tested
+Milestone **M2** is complete. The project now has a fully tested local document-processing
 foundation:
 
 - FastAPI application;
@@ -49,11 +49,14 @@ foundation:
 - character-based chunking with a 1,800-character target and a strict 2,400-character maximum;
 - page and semantic-section boundaries preserved for future citations;
 - sentence-aware overlap capped at 300 characters within the same page and section;
-- Markdown headings repeated as context and tables kept whole or split by row with their header.
+- Markdown headings repeated as context and tables kept whole or split by row with their header;
 - one asynchronous use case composing validation, format routing, extraction, and chunking;
 - an atomic `ProcessedDocument` result containing provenance, counts, and chunks but no raw bytes;
 - a 120-second maximum local deadline, caller cancellation, and no retry or background work;
-- terminal structured logs limited to request ID, hash, format, duration, counts, and result.
+- terminal structured logs limited to request ID, hash, format, duration, counts, and result;
+- committed public-safe Markdown, text, and two-page textual PDF fixtures;
+- explicit upload threat model, M2 architecture, reproducible validation guide, and boundary tests;
+- OpenAPI contract tests proving that only implemented infrastructure routes are advertised.
 
 Persistence from the application, embeddings, retrieval, and answer generation are planned but are
 not implemented yet. OCR is intentionally outside the MVP.
@@ -260,6 +263,18 @@ ruff format --check .
 The default `python -m pytest` command remains safe: integration tests require both the marker
 selection and `FINRAG_RUN_INTEGRATION=1`, otherwise they are skipped.
 
+Run the three committed fixtures through the complete local pipeline without printing content:
+
+```bash
+python scripts/validate_documents.py \
+  tests/fixtures/documents/synthetic_liquidity_report.md \
+  tests/fixtures/documents/synthetic_credit_notes.txt \
+  tests/fixtures/documents/synthetic_risk_report.pdf
+```
+
+See the [M2 validation guide](docs/m2-validation.md) for the complete local, Docker, Swagger, CI,
+and public BCB document procedure.
+
 ## Continuous integration
 
 The GitHub Actions workflow runs on every push and pull request, and can also be started manually.
@@ -277,12 +292,16 @@ temporary containers and volume.
 - [M0 API contract](docs/api-contract-m0.md)
 - [Architecture Decision Records](docs/adr/README.md)
 - [M1 architecture](docs/architecture-m1.md)
+- [M2 document-processing architecture](docs/architecture-m2.md)
 - [Document database schema](docs/database-schema.md)
 - [Document input validation](docs/document-input-validation.md)
 - [Markdown and plain-text extraction](docs/text-extraction.md)
 - [Textual PDF extraction](docs/pdf-extraction.md)
 - [Structure-aware chunking](docs/chunking.md)
 - [Local document processing](docs/document-processing.md)
+- [Future upload threat model](docs/upload-threat-model.md)
+- [M2 reproducible validation](docs/m2-validation.md)
+- [Synthetic fixture inventory](tests/fixtures/documents/README.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
 The M0 documents define the intended MVP behavior. This README distinguishes implemented
@@ -313,11 +332,12 @@ features from planned work so that portfolio claims remain verifiable.
 - Frontmatter and prompt injection remain untrusted content and cannot change application behavior.
 - PDF extraction ignores active and embedded content and rejects encrypted or image-only files.
 - Processing logs never contain raw bytes, document text, filenames, URLs, or complete metadata.
+- Upload threats and remaining HTTP controls are explicitly separated from implemented local
+  protections.
 - Unexpected failures return a generic `internal_error` envelope.
 
-## Next issue
+## Next milestone
 
-M2-07 will close the milestone with consolidated fixtures, quality evidence, upload-threat
-documentation, and CI verification. Upload endpoints, embeddings, retrieval, answer generation,
-agent behavior, observability, and cloud deployment remain later work and must not be presented as
-implemented features.
+The next planned milestone will integrate Google `gemini-embedding-001` with 768 dimensions and
+atomic persistence. Upload endpoints, retrieval, answer generation, agent behavior, observability,
+and cloud deployment remain later work and must not be presented as implemented features.

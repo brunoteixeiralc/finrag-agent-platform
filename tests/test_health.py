@@ -24,12 +24,13 @@ def test_health_returns_ok_without_external_dependencies(client: TestClient) -> 
     assert response.json() == {"status": "ok"}
 
 
-def test_openapi_documents_health_endpoint(client: TestClient) -> None:
+def test_openapi_exposes_only_implemented_routes(client: TestClient) -> None:
     response = client.get("/openapi.json")
 
     assert response.status_code == 200
-    assert "/health" in response.json()["paths"]
-    assert "/ready" in response.json()["paths"]
+    assert set(response.json()["paths"]) == {"/health", "/ready"}
+    assert "/v1/documents" not in response.json()["paths"]
+    assert "/v1/query" not in response.json()["paths"]
 
 
 def test_swagger_ui_is_available(client: TestClient) -> None:

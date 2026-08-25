@@ -1,0 +1,10 @@
+Synthetic Credit Portfolio Notes
+
+This fixture contains fictional aggregate values only. It has no customer names, account numbers,
+contracts, credentials, or information from a real financial institution.
+
+The synthetic portfolio balance is BRL 48.0 million. Performing exposures represent 96.5 percent
+of the portfolio, while the fictional ninety-day delinquency ratio is 1.8 percent.
+
+The adverse scenario increases the synthetic delinquency ratio to 3.2 percent. This scenario exists
+only to test deterministic text extraction and chunking.

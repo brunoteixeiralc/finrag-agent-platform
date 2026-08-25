@@ -85,6 +85,14 @@ def test_file_larger_than_five_mib_is_rejected() -> None:
     assert captured_error.value.code is IngestionErrorCode.FILE_TOO_LARGE
 
 
+def test_file_at_exactly_five_mib_is_accepted_by_input_validation() -> None:
+    file = received_file(content=b"x" * MAX_FILE_SIZE_BYTES)
+
+    validated = validate_document_input(file)
+
+    assert len(validated.content) == MAX_FILE_SIZE_BYTES
+
+
 @pytest.mark.parametrize(
     ("file", "expected_code"),
     [

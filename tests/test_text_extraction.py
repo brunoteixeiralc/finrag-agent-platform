@@ -178,6 +178,18 @@ def test_extracted_character_limit_uses_normalized_text() -> None:
     assert captured_error.value.code is IngestionErrorCode.EXTRACTED_TEXT_TOO_LARGE
 
 
+def test_text_at_exact_extracted_character_limit_is_accepted() -> None:
+    source = validated_text(
+        b"x" * MAX_EXTRACTED_CHARACTERS,
+        filename="boundary.txt",
+        mime_type="text/plain",
+    )
+
+    extracted = extract_text_document(source)
+
+    assert extracted.character_count == MAX_EXTRACTED_CHARACTERS
+
+
 def test_title_derived_from_heading_respects_contract_limit() -> None:
     source = validated_text(("# " + "x" * 201).encode())
 
