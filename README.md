@@ -6,7 +6,7 @@ financial documents.
 
 ## Current status
 
-Milestone **M2-03** adds deterministic Markdown and plain-text extraction to the tested foundation:
+Milestone **M2-04** adds safe textual-PDF extraction to the tested foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -40,9 +40,14 @@ Milestone **M2-03** adds deterministic Markdown and plain-text extraction to the
 - ordered structural blocks for headings, paragraphs, lists, tables, and frontmatter;
 - hierarchical Markdown sections and deterministic title derivation;
 - prompt injection preserved as untrusted document content, never executed as an instruction.
+- strict textual-PDF parsing with one-based physical page indexes and explicit page labels when
+  present;
+- rejection of encrypted, malformed, image-only, oversized, or over-50-page PDFs with safe errors;
+- no execution or traversal of PDF JavaScript, links, attachments, or embedded content;
+- manual extraction checks against three public June 2026 Banco Central do Brasil reports.
 
-PDF extraction, chunking, persistence from the application, embeddings, retrieval, and answer
-generation are planned but are not implemented yet.
+Chunking, persistence from the application, embeddings, retrieval, and answer generation are
+planned but are not implemented yet. OCR is intentionally outside the MVP.
 
 ## Requirements
 
@@ -266,6 +271,7 @@ temporary containers and volume.
 - [Document database schema](docs/database-schema.md)
 - [Document input validation](docs/document-input-validation.md)
 - [Markdown and plain-text extraction](docs/text-extraction.md)
+- [Textual PDF extraction](docs/pdf-extraction.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
 The M0 documents define the intended MVP behavior. This README distinguishes implemented
@@ -294,10 +300,11 @@ features from planned work so that portfolio claims remain verifiable.
 - Supplied filenames are normalized for display only and never used as filesystem paths.
 - Source URLs are validated and stored without making outbound requests.
 - Frontmatter and prompt injection remain untrusted content and cannot change application behavior.
+- PDF extraction ignores active and embedded content and rejects encrypted or image-only files.
 - Unexpected failures return a generic `internal_error` envelope.
 
 ## Next issue
 
-M2-04 will extract textual PDFs while preserving page locations. Upload endpoints, embeddings,
+M2-05 will implement deterministic structure-aware chunking. Upload endpoints, embeddings,
 retrieval, answer generation, agent behavior, observability, and cloud deployment remain later work
 and must not be presented as implemented features.

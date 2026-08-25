@@ -15,7 +15,7 @@ complete normalized content for auditing and an ordered sequence of blocks for f
 - `list`;
 - `table`.
 
-Physical page indexes remain reserved for the PDF extractor in M2-04.
+Physical page indexes are populated only by the PDF extractor introduced in M2-04.
 
 ## Normalization and limits
 

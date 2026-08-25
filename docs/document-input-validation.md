@@ -15,7 +15,7 @@ validate size, name, extension, MIME, signature, and fields
 ValidatedDocumentInput + deterministic SHA-256
         |
         v
-text extractor or future PDF extractor -> ExtractedDocument
+text extractor or PDF extractor -> ExtractedDocument
         |
         v
 future chunker -> ChunkDraft
@@ -36,7 +36,8 @@ the embedding provider is not part of M2.
 - SHA-256 is calculated over those original bytes.
 - MIME parameters such as `charset=utf-8` are removed before comparison.
 - Text decoding and empty-whitespace detection belong to M2-03.
-- PDF parsing, page limits, and selectable-text checks belong to M2-04.
+- PDF parsing, page limits, and selectable-text checks are performed by the M2-04 extractor after
+  this initial byte-level validation.
 
 ## Filename handling
 

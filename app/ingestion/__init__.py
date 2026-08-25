@@ -11,6 +11,7 @@ from app.ingestion.models import (
     SupportedMimeType,
     ValidatedDocumentInput,
 )
+from app.ingestion.pdf_extraction import extract_pdf_document
 from app.ingestion.text_extraction import extract_text_document
 from app.ingestion.validation import validate_document_input
 
@@ -25,6 +26,7 @@ __all__ = [
     "ReceivedDocumentFile",
     "SupportedMimeType",
     "ValidatedDocumentInput",
+    "extract_pdf_document",
     "extract_text_document",
     "validate_document_input",
 ]

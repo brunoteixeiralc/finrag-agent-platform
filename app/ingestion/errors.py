@@ -25,6 +25,11 @@ class IngestionErrorCode(StrEnum):
     EMPTY_EXTRACTED_TEXT = "empty_extracted_text"
     EXTRACTED_TEXT_TOO_LARGE = "extracted_text_too_large"
     UNSUPPORTED_EXTRACTION_TYPE = "unsupported_extraction_type"
+    PDF_MALFORMED = "pdf_malformed"
+    PDF_ENCRYPTED = "pdf_encrypted"
+    PDF_PAGE_LIMIT_EXCEEDED = "pdf_page_limit_exceeded"
+    PDF_OCR_UNSUPPORTED = "pdf_ocr_unsupported"
+    PDF_CONTENT_STREAM_TOO_LARGE = "pdf_content_stream_too_large"
 
 
 class DocumentValidationError(ValueError):
