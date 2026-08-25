@@ -38,8 +38,8 @@ def create_app(
         title=resolved_settings.app_name,
         summary="Evidence-grounded RAG API for public and synthetic documents.",
         description=(
-            "M1 foundation of the FinRAG Agent Platform. Document ingestion and RAG query "
-            "endpoints are planned but are not implemented yet."
+            "The local document-processing foundation is implemented. Document ingestion and "
+            "RAG query endpoints are planned but are not implemented yet."
         ),
         version="0.1.0",
         docs_url="/docs",

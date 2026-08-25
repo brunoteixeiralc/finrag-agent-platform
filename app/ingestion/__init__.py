@@ -8,11 +8,13 @@ from app.ingestion.models import (
     ExtractedBlockKind,
     ExtractedDocument,
     ExtractedPage,
+    ProcessedDocument,
     ReceivedDocumentFile,
     SupportedMimeType,
     ValidatedDocumentInput,
 )
 from app.ingestion.pdf_extraction import extract_pdf_document
+from app.ingestion.processing import DocumentProcessingTimeoutError, process_document
 from app.ingestion.text_extraction import extract_text_document
 from app.ingestion.validation import validate_document_input
 
@@ -24,11 +26,14 @@ __all__ = [
     "ExtractedDocument",
     "ExtractedPage",
     "IngestionErrorCode",
+    "ProcessedDocument",
     "ReceivedDocumentFile",
     "SupportedMimeType",
     "ValidatedDocumentInput",
     "chunk_document",
+    "DocumentProcessingTimeoutError",
     "extract_pdf_document",
     "extract_text_document",
+    "process_document",
     "validate_document_input",
 ]

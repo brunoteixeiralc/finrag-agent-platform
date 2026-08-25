@@ -92,3 +92,21 @@ class ChunkDraft:
     page_label: str | None = None
     section: str | None = None
     contains_table: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class ProcessedDocument:
+    """Complete local processing result without raw file bytes or embeddings."""
+
+    original_filename: str
+    mime_type: SupportedMimeType
+    sha256: str
+    title: str
+    source_name: str | None
+    source_url: str | None
+    published_at: date | None
+    metadata: Mapping[str, MetadataValue]
+    page_count: int
+    character_count: int
+    chunks_count: int
+    chunks: tuple[ChunkDraft, ...]

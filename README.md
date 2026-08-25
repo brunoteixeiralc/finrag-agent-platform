@@ -6,7 +6,8 @@ financial documents.
 
 ## Current status
 
-Milestone **M2-05** adds deterministic structure-aware chunking to the tested foundation:
+Milestone **M2-06** composes the complete local document-processing pipeline on the tested
+foundation:
 
 - FastAPI application;
 - `GET /health` liveness endpoint;
@@ -49,9 +50,13 @@ Milestone **M2-05** adds deterministic structure-aware chunking to the tested fo
 - page and semantic-section boundaries preserved for future citations;
 - sentence-aware overlap capped at 300 characters within the same page and section;
 - Markdown headings repeated as context and tables kept whole or split by row with their header.
+- one asynchronous use case composing validation, format routing, extraction, and chunking;
+- an atomic `ProcessedDocument` result containing provenance, counts, and chunks but no raw bytes;
+- a 120-second maximum local deadline, caller cancellation, and no retry or background work;
+- terminal structured logs limited to request ID, hash, format, duration, counts, and result.
 
-Processing orchestration, persistence from the application, embeddings, retrieval, and answer
-generation are planned but are not implemented yet. OCR is intentionally outside the MVP.
+Persistence from the application, embeddings, retrieval, and answer generation are planned but are
+not implemented yet. OCR is intentionally outside the MVP.
 
 ## Requirements
 
@@ -277,6 +282,7 @@ temporary containers and volume.
 - [Markdown and plain-text extraction](docs/text-extraction.md)
 - [Textual PDF extraction](docs/pdf-extraction.md)
 - [Structure-aware chunking](docs/chunking.md)
+- [Local document processing](docs/document-processing.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
 The M0 documents define the intended MVP behavior. This README distinguishes implemented
@@ -306,10 +312,12 @@ features from planned work so that portfolio claims remain verifiable.
 - Source URLs are validated and stored without making outbound requests.
 - Frontmatter and prompt injection remain untrusted content and cannot change application behavior.
 - PDF extraction ignores active and embedded content and rejects encrypted or image-only files.
+- Processing logs never contain raw bytes, document text, filenames, URLs, or complete metadata.
 - Unexpected failures return a generic `internal_error` envelope.
 
 ## Next issue
 
-M2-06 will compose validation, extraction, and chunking into one local processing use case. Upload
-endpoints, embeddings, retrieval, answer generation, agent behavior, observability, and cloud
-deployment remain later work and must not be presented as implemented features.
+M2-07 will close the milestone with consolidated fixtures, quality evidence, upload-threat
+documentation, and CI verification. Upload endpoints, embeddings, retrieval, answer generation,
+agent behavior, observability, and cloud deployment remain later work and must not be presented as
+implemented features.
